@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pybuild/
+.pytest_cache/
+# debhelper output
+debian/agctl/
+debian/.debhelper/
+debian/files
+debian/*.substvars
+debian/*.debhelper
+debian/*.log
+debian/debhelper-build-stamp
+*.deb
+*.changes
+*.buildinfo
+# never commit vendor material (decompiled code, extracted assets, installers)
+research/
+*.exe
+*.msi
+*.dmg
+*.app/

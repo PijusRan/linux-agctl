@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agctl"
+version = "0.1.0"
+description = "Native Linux controller for Yamaha AG06MK2 / AG03MK2 mixers"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "PijusRan" }]
+keywords = ["yamaha", "ag06", "ag03", "ag06mk2", "mixer", "midi", "sysex", "linux"]
+classifiers = [
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Multimedia :: Sound/Audio :: Mixers",
+  "Programming Language :: Python :: 3",
+]
+dependencies = ["python-rtmidi"]
+
+[project.urls]
+Homepage = "https://github.com/PijusRan/agctl"
+Issues = "https://github.com/PijusRan/agctl/issues"
+
+[project.optional-dependencies]
+gui = ["PySide6"]
+
+[project.scripts]
+agctl = "agctl.cli:main"
+
+[project.gui-scripts]
+agctl-gui = "agctl.gui.app:main"
+
+[tool.setuptools.packages.find]
+include = ["agctl*"]

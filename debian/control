@@ -1,0 +1,18 @@
+Source: agctl
+Section: sound
+Priority: optional
+Maintainer: PijusRan <PijusRan@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), dh-python, python3-all, python3-setuptools, pybuild-plugin-pyproject, python3-pytest, python3-rtmidi
+Standards-Version: 4.7.0
+Homepage: https://github.com/PijusRan/agctl
+Vcs-Git: https://github.com/PijusRan/agctl.git
+Vcs-Browser: https://github.com/PijusRan/agctl
+Rules-Requires-Root: no
+
+Package: agctl
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3-rtmidi, python3-pyside6.qtwidgets, python3-pyside6.qtgui, python3-pyside6.qtcore
+Description: native controller for Yamaha AG06MK2 / AG03MK2 mixers
+ Controls the hardware switches (CH1/CH2 effect send, CH1 COMP/EQ, CH2 AMP SIM),
+ the assignable foot switch and shows live level meters over the mixer's USB
+ MIDI port. Includes a command-line tool (agctl) and a desktop app (agctl-gui).

@@ -1,0 +1,5 @@
+agctl (0.1.0) unstable; urgency=medium
+
+  * Initial release: switches, foot switch, level meters, CLI and GUI.
+
+ -- PijusRan <PijusRan@users.noreply.github.com>  Sun, 22 Nov 2026 10:59:11 +0200

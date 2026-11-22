@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+export PYBUILD_NAME=agctl
+export PYBUILD_TEST_ARGS=-q {dir}/tests
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+execute_after_dh_auto_install:
+	install -Dm644 packaging/agctl.desktop debian/agctl/usr/share/applications/agctl.desktop
+	install -Dm644 packaging/agctl.svg debian/agctl/usr/share/icons/hicolor/scalable/apps/agctl.svg

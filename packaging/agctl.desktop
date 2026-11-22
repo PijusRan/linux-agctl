@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=AG Mixer Control
+GenericName=Mixer Control
+Comment=Native controller for Yamaha AG06MK2 / AG03MK2 switches, foot switch and level meters
+Exec=agctl-gui
+Icon=agctl
+Terminal=false
+Categories=AudioVideo;Audio;Mixer;
+Keywords=Yamaha;AG06;AG03;mixer;midi;
+StartupWMClass=agctl

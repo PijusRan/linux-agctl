@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=AG Controller
+GenericName=AG06MK2 / AG03MK2 Mixer Editor
+Comment=Yamaha AG Controller (Windows version running under Wine)
+Exec=@BIN@/ag-controller
+Icon=audio-card
+Terminal=false
+Categories=AudioVideo;Audio;Mixer;
+StartupNotify=true
+StartupWMClass=agcontroller.exe

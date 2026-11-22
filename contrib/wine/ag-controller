@@ -1,0 +1,15 @@
+#!/bin/sh
+# Launch Yamaha AG Controller (Windows build) under Wine.
+# The mixer's USB-MIDI port is reached through Wine's ALSA MIDI driver.
+# Note: running it with Wine debug channels enabled slows it enough that it fails to connect.
+export WINEPREFIX="$HOME/.local/share/yamaha-ag-controller/wine"
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES="winemenubuilder.exe=d;mscoree=d;mshtml=d"
+APP="$WINEPREFIX/drive_c/Program Files/Yamaha/AGController"
+command -v wine >/dev/null || { echo "wine is not installed" >&2; exit 1; }
+[ -f "$APP/AGController.exe" ] || { echo "AG Controller is not installed; run install-ag-controller.sh" >&2; exit 1; }
+if ! aconnect -l 2>/dev/null | grep -q 'AG0[36]MK2'; then
+  command -v notify-send >/dev/null && notify-send "AG Controller" "Mixer not detected - plug in and power on the AG06MK2/AG03MK2, then restart."
+fi
+cd "$APP" || exit 1
+exec wine AGController.exe "$@"

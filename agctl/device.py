@@ -8,6 +8,8 @@ from typing import Callable
 import rtmidi
 
 from . import protocol as p
+from . import safety
+from .dsp import DspWrite
 
 PORT_HINTS = p.SUPPORTED_MODELS
 
@@ -147,6 +149,11 @@ class Device:
 
     def set_footswitch(self, function: int) -> None:
         self._ack(p.CMD_FOOTSWITCH, p.footswitch_payload(function))
+
+    def write_dsp(self, write: DspWrite) -> None:
+        """Send one verified DSP block. Raises SafetyError before sending anything unexpected."""
+        safety.check(write)
+        self._ack(p.CMD_DSP_WRITE, write.payload())
 
     def start_meters(self) -> None:
         self._ack(p.CMD_METER, [1])

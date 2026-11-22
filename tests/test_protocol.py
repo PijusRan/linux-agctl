@@ -67,3 +67,15 @@ def test_footswitch_payload():
         pass
     else:
         raise AssertionError
+
+
+def test_safety_accepts_verified_and_rejects_unknown():
+    from agctl import safety
+    from agctl.dsp import DspWrite
+    safety.check(DspWrite(0x209, (3667,)))
+    for bad in (DspWrite(0x257, (1, 2)), DspWrite(0x209, (1, 2)), DspWrite(0x28E, (0xFFFF, 0))):
+        try:
+            safety.check(bad)
+        except safety.SafetyError:
+            continue
+        raise AssertionError(bad)

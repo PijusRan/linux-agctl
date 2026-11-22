@@ -8,7 +8,10 @@ import time
 
 from . import __version__
 from . import protocol as p
+from . import state
 from .device import Device, DeviceError
+from .dsp import mixer
+from .safety import SafetyError
 
 SWITCH_ALIASES = {
     "fx1": "ch1_fx", "fx2": "ch2_fx", "compeq": "ch1_compeq", "ampsim": "ch2_ampsim",
@@ -40,7 +43,20 @@ def main(argv: list[str] | None = None) -> int:
     f.add_argument("function", choices=sorted(FOOT_ALIASES))
     m = sub.add_parser("meters", help="print live level meters (Ctrl+C to stop)")
     m.add_argument("--seconds", type=float, default=0, help="stop after N seconds (0 = until Ctrl+C)")
+    d = sub.add_parser("dsp", help="DSP parameters (levels, pan, EQ, HPF, compressor)")
+    dsub = d.add_subparsers(dest="dcmd", required=True)
+    di = dsub.add_parser("import", help="import a scene (default: Yamaha AG Controller's saved scene)")
+    di.add_argument("path", nargs="?")
+    dg = dsub.add_parser("get", help="show scene values")
+    dg.add_argument("column", nargs="?")
+    ds = dsub.add_parser("set", help="change one value and send it to the mixer")
+    ds.add_argument("column")
+    ds.add_argument("value", type=float)
+    dsub.add_parser("push", help="send all verified DSP values of the scene to the mixer")
     args = ap.parse_args(argv)
+
+    if args.cmd == "dsp" and args.dcmd in ("import", "get"):
+        return _dsp_offline(args)
 
     dev = Device("agctl-cli")
     try:
@@ -55,6 +71,26 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "footswitch":
             dev.set_footswitch(FOOT_ALIASES[args.function])
             _print_status(dev.read_status())
+        elif args.cmd == "dsp":
+            sc = state.load()
+            if sc is None:
+                print("agctl: no scene yet; run 'agctl dsp import' first", file=sys.stderr)
+                return 1
+            if args.dcmd == "set":
+                if args.column not in sc or args.column in ("Category", "ModelBitmap", ";Name"):
+                    print(f"agctl: unknown parameter {args.column}", file=sys.stderr)
+                    return 1
+                sc[args.column] = args.value
+                writes = mixer.writes_for(sc, args.column)
+                if not writes:
+                    print(f"agctl: {args.column} is not supported natively yet", file=sys.stderr)
+                    return 1
+            else:
+                writes = mixer.all_verified_writes(sc)
+            for w in writes:
+                dev.write_dsp(w)
+            state.save(sc)
+            print(f"sent {len(writes)} DSP block(s)")
         elif args.cmd == "meters":
             dev.start_meters()
             names = ("ch1_in", "ch2_in", "ch1_out", "ch2_out", "fx_l", "fx_r", "master_l", "master_r")
@@ -66,13 +102,32 @@ def main(argv: list[str] | None = None) -> int:
                     print(" ".join(f"{_fmt_db(st.meters_db.get(n, -math.inf)):>8s}" for n in names), end="\r", flush=True)
                 time.sleep(0.1)
             print()
-    except DeviceError as e:
+    except (DeviceError, SafetyError) as e:
         print(f"agctl: {e}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print()
     finally:
         dev.close()
+    return 0
+
+
+def _dsp_offline(args) -> int:
+    try:
+        if args.dcmd == "import":
+            sc = state.import_scene(args.path)
+            print(f"imported scene '{sc[';Name']}' -> {state.STATE}")
+        else:
+            sc = state.load()
+            if sc is None:
+                print("agctl: no scene yet; run 'agctl dsp import' first", file=sys.stderr)
+                return 1
+            for k, v in sc.items():
+                if args.column is None or k == args.column:
+                    print(f"{k:22s} {v}")
+    except (FileNotFoundError, ValueError) as e:
+        print(f"agctl: {e}", file=sys.stderr)
+        return 1
     return 0
 
 

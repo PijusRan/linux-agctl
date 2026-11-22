@@ -28,6 +28,8 @@ CMD_GET_HASH = 0x2006      # reply: 32-byte hash of the mixer's parameter memory
 CMD_SWITCH = 0x1030        # payload [index, on]
 CMD_METER = 0x1040         # payload [1] start / [0] stop streaming
 CMD_FOOTSWITCH = 0x1050    # payload [0x10, function]
+CMD_DSP_WRITE = 0x1000     # payload [addr u16][n-1 u16][n x u16] (see agctl.dsp)
+CMD_SET_HASH = 0x1006      # payload: 32-byte scene hash (sent by the controller after a full sync)
 CMD_METER_STATUS = 0x6041  # unsolicited: meters + switch status (~every 50 ms)
 REPLY_FLAG = 0x4000
 
